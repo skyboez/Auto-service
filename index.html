@@ -16,4 +16,22 @@ function render(){data=read();$('month').textContent=new Intl.DateTimeFormat('pt
 ['dateFilter','statusFilter','search'].forEach(id=>$(id).addEventListener('input',render));$('clear').onclick=()=>{$('dateFilter').value='';$('statusFilter').value='';$('search').value='';render()};
 function openForm(x){$('title').textContent=x?'Editar agendamento':'Novo agendamento';$('id').value=x?.id||'';$('date').value=x?.date||today();$('status').value=x?.status||'Agendado';$('customer').value=x?.customer||'';$('phone').value=x?.phone||'';$('vehicle').value=x?.vehicle||'';$('plate').value=x?.plate||'';$('service').value=x?.service||'Lanternagem';$('color').value=x?.color||'';$('notes').value=x?.notes||'';$('back').classList.remove('hidden')}function closeForm(){$('back').classList.add('hidden')}$('new').onclick=()=>openForm();$('cancel').onclick=closeForm;$('back').onclick=e=>{if(e.target===$('back'))closeForm()};$('form').onsubmit=e=>{e.preventDefault();let id=$('id').value||crypto.randomUUID(),x={id,date:$('date').value,status:$('status').value,customer:$('customer').value.trim(),phone:$('phone').value.trim(),vehicle:$('vehicle').value.trim(),plate:$('plate').value.trim().toUpperCase(),service:$('service').value,color:$('color').value.trim(),notes:$('notes').value.trim()},i=data.findIndex(a=>a.id===id);i>=0?data[i]=x:data.push(x);write(data);closeForm();render()};window.edit=id=>openForm(read().find(x=>x.id===id));window.del=id=>{if(confirm('Excluir este agendamento?')){write(read().filter(x=>x.id!==id));render()}};
 $('export').onclick=()=>{let b=new Blob([JSON.stringify(read(),null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='agenda-auto-service.json';a.click()};$('import').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!Array.isArray(x))throw 0;write(x);render();alert('Agenda importada!')}catch{alert('Arquivo inválido.')}};r.readAsText(f);e.target.value=''};
+</script><script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCHYyGCIZoJdsCDqOZqLODjWS1Uvrmmxz4",
+    authDomain: "auto-service-agenda.firebaseapp.com",
+    projectId: "auto-service-agenda",
+    storageBucket: "auto-service-agenda.firebasestorage.app",
+    messagingSenderId: "1067826752833",
+    appId: "1:1067826752833:web:9bb388e2f3c1f8c53e85c0",
+    measurementId: "G-EQ1H6YRMRS"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  console.log("Firebase conectado!");
 </script></body></html>
