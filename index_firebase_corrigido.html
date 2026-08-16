@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
+<title>Auto Service | Agenda</title>
+<style>
+:root{
+  --bg:#080a0d;--card:#11151a;--card2:#171c22;--line:#29313b;
+  --text:#f5f7fa;--muted:#9da7b3;--blue:#6fa7ff;--green:#70d59a;
+  --yellow:#f1ca70;--red:#ff7070;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top,#202832 0,#0b0e12 42%,#07090c 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.wrap{max-width:1150px;margin:auto;padding:18px}
+header{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{width:62px;height:62px;border-radius:18px;background:#fff;color:#0b0d10;display:grid;place-items:center;font-size:31px;font-weight:900;box-shadow:0 15px 45px #0008}
+.brand h1{margin:0;font-size:clamp(22px,5vw,32px)}
+.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--card2);color:var(--text);padding:11px 14px;border-radius:12px;font-weight:800}
+.btn.primary{background:#f4f5f7;color:#090b0e;border-color:#f4f5f7}
+.btn.danger{color:#ff9d9d}
+.stats{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:linear-gradient(180deg,#171c22f2,#0e1217f5);border:1px solid var(--line);border-radius:21px;padding:20px;box-shadow:0 20px 60px #0006}
+.kicker{color:var(--muted);text-transform:uppercase;letter-spacing:1.4px;font-size:12px;font-weight:900}
+.month{font-size:clamp(27px,7vw,48px);font-weight:950;margin-top:7px}
+.number{font-size:42px;font-weight:950;margin-top:4px}
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px}
+input,select,textarea{background:#0a0d11;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;outline:none}
+.filters input{flex:1;min-width:190px}
+.agenda{display:grid;gap:14px}
+.day{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#0f1318e8}
+.dayhead{padding:14px 16px;background:#151a20;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+.daytitle{font-weight:900}.count{color:var(--muted);font-size:13px}
+.item{display:grid;grid-template-columns:1.3fr 1fr .8fr auto;gap:12px;align-items:center;padding:15px 16px;border-bottom:1px solid #20262e}
+.item:last-child{border:0}
+.customer{font-weight:900}.service{font-weight:800}
+.meta{font-size:13px;color:var(--muted);margin-top:4px}
+.badge{display:inline-block;padding:7px 10px;border-radius:99px;font-size:12px;font-weight:900}
+.agendado{background:#6fa7ff1c;color:#a9c9ff;border:1px solid #6fa7ff55}
+.andamento{background:#f1ca701c;color:#f7d991;border:1px solid #f1ca7055}
+.pronto{background:#70d59a1c;color:#9be7ba;border:1px solid #70d59a55}
+.entregue{background:#ffffff12;color:#d9dee5;border:1px solid #ffffff2b}
+.itemBtns{display:flex;gap:7px}
+.icon{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#151a20;color:#fff}
+.empty{text-align:center;color:var(--muted);padding:40px;border:1px dashed #343d48;border-radius:17px}
+.back{position:fixed;inset:0;background:#000b;display:grid;place-items:center;padding:15px;z-index:10}
+.modal{width:min(680px,100%);max-height:92vh;overflow:auto;background:#11161b;border:1px solid var(--line);border-radius:23px;padding:20px}
+.modal h2{margin:0 0 17px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.field{display:grid;gap:6px;margin-bottom:11px}
+.field label{font-size:12px;color:#b9c1ca;font-weight:800}
+.field textarea{min-height:90px;resize:vertical}
+.footer{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.loginbox{width:min(420px,100%);background:linear-gradient(180deg,#171c22,#0d1116);border:1px solid var(--line);border-radius:27px;padding:28px;text-align:center;box-shadow:0 25px 80px #0008}
+.loginlogo{width:100px;height:100px;border-radius:27px;background:#fff;color:#0b0d10;display:grid;place-items:center;font-size:50px;font-weight:950;margin:auto auto 16px}
+.loginbox h1{margin:0 0 7px}.loginbox p{color:var(--muted);margin:0 0 20px}
+.loginbox input{width:100%;margin-bottom:9px}
+.loginbox .btn{width:100%}
+.msg{min-height:20px;color:#ff9898;font-size:13px;margin-top:8px}
+.small{color:var(--muted);font-size:12px;margin-top:14px}
+@media(max-width:760px){
+  .wrap{padding:13px}header{align-items:flex-start;flex-direction:column}
+  .stats{grid-template-columns:1fr}.item{grid-template-columns:1fr auto}
+  .item>div:nth-child(2),.item>div:nth-child(3){grid-column:1}
+  .itemBtns{grid-column:2;grid-row:1/span 3;flex-direction:column}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<section id="login" class="login">
+  <div class="loginbox">
+    <div class="loginlogo">AS</div>
+    <h1>Auto Service</h1>
+    <p>Agenda da oficina</p>
+    <input id="pass" type="password" placeholder="Senha do Firebase" autocomplete="current-password">
+    <button class="btn primary" id="enter">Entrar</button>
+    <div id="msg" class="msg"></div>
+    <div class="small">Login e agenda sincronizados pelo Firebase.</div>
+  </div>
+</section>
+
+<main id="app" class="wrap hidden">
+  <header>
+    <div class="brand">
+      <div class="logo">AS</div>
+      <div><h1>Auto Service</h1><p>Lanternagem e pintura • Agenda</p></div>
+    </div>
+    <div class="actions">
+      <button class="btn danger" id="exit">Sair</button>
+      <button class="btn primary" id="new">+ Agendamento</button>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div class="card"><div class="kicker">Visão da agenda</div><div class="month" id="month"></div></div>
+    <div class="card"><div class="kicker">Hoje</div><div class="number" id="todayCount">0</div><div class="meta">serviços pendentes</div></div>
+  </section>
+
+  <section class="card">
+    <div class="filters">
+      <input id="dateFilter" type="date">
+      <select id="statusFilter">
+        <option value="">Todos os status</option>
+        <option>Agendado</option><option>Em andamento</option><option>Pronto</option><option>Entregue</option>
+      </select>
+      <input id="search" placeholder="Buscar cliente, carro, placa ou serviço">
+      <button class="btn" id="clear">Limpar</button>
+    </div>
+    <div id="agenda" class="agenda"></div>
+  </section>
+</main>
+
+<div id="back" class="back hidden">
+<form id="form" class="modal">
+<h2 id="title">Novo agendamento</h2>
+<input id="id" type="hidden">
+<div class="grid">
+<div class="field"><label>Data *</label><input id="date" type="date" required></div>
+<div class="field"><label>Status</label><select id="status"><option>Agendado</option><option>Em andamento</option><option>Pronto</option><option>Entregue</option></select></div>
+<div class="field"><label>Cliente *</label><input id="customer" required placeholder="Nome do cliente"></div>
+<div class="field"><label>Telefone</label><input id="phone" placeholder="(27) 99999-9999"></div>
+<div class="field"><label>Veículo *</label><input id="vehicle" required placeholder="Ex.: Gol 2018"></div>
+<div class="field"><label>Placa</label><input id="plate" placeholder="ABC1D23"></div>
+<div class="field"><label>Serviço *</label><select id="service"><option>Lanternagem</option><option>Pintura</option><option>Lanternagem + Pintura</option></select></div>
+<div class="field"><label>Cor</label><input id="color" placeholder="Ex.: Preto"></div>
+</div>
+<div class="field"><label>Observações</label><textarea id="notes" placeholder="Detalhes do serviço, peças, prazo..."></textarea></div>
+<div class="footer"><button type="button" class="btn" id="cancel">Cancelar</button><button class="btn primary">Salvar</button></div>
+</form>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCHYyGCIZoJdsCDqOZqLODjWS1Uvrmmxz4",
+  authDomain: "auto-service-agenda.firebaseapp.com",
+  projectId: "auto-service-agenda",
+  storageBucket: "auto-service-agenda.firebasestorage.app",
+  messagingSenderId: "1067826752833",
+  appId: "1:1067826752833:web:9bb388e2f3c1f8c53e85c0",
+  measurementId: "G-EQ1H6YRMRS"
+};
+
+const FIREBASE_EMAIL = "projetoautoservice@gmail.com";
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+
+const $ = id => document.getElementById(id);
+const today = () => new Date().toISOString().slice(0,10);
+let data = [];
+let unsubscribe = null;
+
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const nice=d=>new Intl.DateTimeFormat('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}).format(new Date(d+'T12:00:00'));
+
+function render(){
+  $('month').textContent=new Intl.DateTimeFormat('pt-BR',{month:'long',year:'numeric'}).format(new Date());
+  $('todayCount').textContent=data.filter(x=>x.date===today()&&x.status!=='Entregue').length;
+
+  const fd=$('dateFilter').value;
+  const fs=$('statusFilter').value;
+  const q=$('search').value.toLowerCase().trim();
+
+  const rows=data
+    .filter(x=>(!fd||x.date===fd)&&(!fs||x.status===fs)&&(!q||[x.customer,x.phone,x.vehicle,x.plate,x.service,x.color,x.notes].join(' ').toLowerCase().includes(q)))
+    .sort((a,b)=>a.date.localeCompare(b.date)||a.customer.localeCompare(b.customer));
+
+  const groups={};
+  rows.forEach(x=>(groups[x.date]??=[]).push(x));
+
+  $('agenda').innerHTML='';
+  if(!rows.length){
+    $('agenda').innerHTML='<div class="empty">Nenhum agendamento encontrado.</div>';
+    return;
+  }
+
+  Object.entries(groups).forEach(([d,items])=>{
+    const sec=document.createElement('section');
+    sec.className='day';
+    sec.innerHTML=`<div class="dayhead"><div class="daytitle">${nice(d)}</div><div class="count">${items.length} serviço${items.length>1?'s':''}</div></div><div>${items.map(x=>{
+      const c=x.status==='Agendado'?'agendado':x.status==='Em andamento'?'andamento':x.status==='Pronto'?'pronto':'entregue';
+      return `<article class="item">
+        <div>
+          <div class="customer">${esc(x.customer)}</div>
+          <div class="meta">${esc(x.vehicle)}${x.plate?' • '+esc(x.plate):''}${x.phone?' • '+esc(x.phone):''}</div>
+          ${x.notes?`<div class="meta">${esc(x.notes)}</div>`:''}
+        </div>
+        <div>
+          <div class="service">${esc(x.service)}</div>
+          <div class="meta">${esc(x.color||'Cor não informada')}</div>
+        </div>
+        <div><span class="badge ${c}">${esc(x.status)}</span></div>
+        <div class="itemBtns">
+          <button class="icon editBtn" data-id="${x.id}">✎</button>
+          <button class="icon delBtn" data-id="${x.id}">×</button>
+        </div>
+      </article>`;
+    }).join('')}</div>`;
+    $('agenda').appendChild(sec);
+  });
+
+  document.querySelectorAll('.editBtn').forEach(btn=>{
+    btn.onclick=()=>openForm(data.find(x=>x.id===btn.dataset.id));
+  });
+
+  document.querySelectorAll('.delBtn').forEach(btn=>{
+    btn.onclick=async()=>{
+      if(confirm('Excluir este agendamento?')){
+        await deleteDoc(doc(db,'agendamentos',btn.dataset.id));
+      }
+    };
+  });
+}
+
+function startSync(){
+  if(unsubscribe) unsubscribe();
+  unsubscribe = onSnapshot(collection(db,'agendamentos'),snapshot=>{
+    data = snapshot.docs.map(d=>({id:d.id,...d.data()}));
+    render();
+  },error=>{
+    console.error(error);
+    $('agenda').innerHTML='<div class="empty">Erro ao carregar a agenda do Firebase.</div>';
+  });
+}
+
+function openForm(x){
+  $('title').textContent=x?'Editar agendamento':'Novo agendamento';
+  $('id').value=x?.id||'';
+  $('date').value=x?.date||today();
+  $('status').value=x?.status||'Agendado';
+  $('customer').value=x?.customer||'';
+  $('phone').value=x?.phone||'';
+  $('vehicle').value=x?.vehicle||'';
+  $('plate').value=x?.plate||'';
+  $('service').value=x?.service||'Lanternagem';
+  $('color').value=x?.color||'';
+  $('notes').value=x?.notes||'';
+  $('back').classList.remove('hidden');
+}
+function closeForm(){$('back').classList.add('hidden')}
+
+$('new').onclick=()=>openForm();
+$('cancel').onclick=closeForm;
+$('back').onclick=e=>{if(e.target===$('back'))closeForm()};
+['dateFilter','statusFilter','search'].forEach(id=>$(id).addEventListener('input',render));
+$('clear').onclick=()=>{$('dateFilter').value='';$('statusFilter').value='';$('search').value='';render()};
+
+$('form').onsubmit=async e=>{
+  e.preventDefault();
+
+  const id=$('id').value||crypto.randomUUID();
+  const item={
+    date:$('date').value,
+    status:$('status').value,
+    customer:$('customer').value.trim(),
+    phone:$('phone').value.trim(),
+    vehicle:$('vehicle').value.trim(),
+    plate:$('plate').value.trim().toUpperCase(),
+    service:$('service').value,
+    color:$('color').value.trim(),
+    notes:$('notes').value.trim()
+  };
+
+  try{
+    await setDoc(doc(db,'agendamentos',id),item);
+    closeForm();
+  }catch(error){
+    console.error(error);
+    alert('Não foi possível salvar no Firebase.');
+  }
+};
+
+$('enter').onclick=async()=>{
+  $('msg').textContent='Entrando...';
+  try{
+    await signInWithEmailAndPassword(auth,FIREBASE_EMAIL,$('pass').value);
+    $('pass').value='';
+    $('msg').textContent='';
+  }catch(error){
+    console.error(error);
+    $('msg').textContent='Senha incorreta ou login não autorizado.';
+  }
+};
+
+$('pass').onkeydown=e=>{
+  if(e.key==='Enter') $('enter').click();
+};
+
+$('exit').onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,user=>{
+  if(user){
+    $('login').classList.add('hidden');
+    $('app').classList.remove('hidden');
+    startSync();
+  }else{
+    if(unsubscribe){
+      unsubscribe();
+      unsubscribe=null;
+    }
+    data=[];
+    $('app').classList.add('hidden');
+    $('login').classList.remove('hidden');
+  }
+});
+</script>
+</body>
+</html>
